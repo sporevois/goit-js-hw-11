@@ -55,3 +55,6 @@ display: flex;
   object-fit: cover;
   transition: transform var(--animation-duration) var(--timing-function);
 }
+.is-hidden{
+  display: none;
+}
