@@ -1,3 +1,4 @@
+import './css/styles.css';
 import axios from "axios";
 import Notiflix from "notiflix";
 
@@ -26,19 +27,23 @@ function renderCards(items) {
       .map(({ webformatURL, tags, likes, views, comments, downloads }) => {
           return `
             <div class="photo-card">
-                <img src="${webformatURL}" alt="${tags}" loading="lazy" width= '240px' />
+                <img class="photo-card__image" src="${webformatURL}" alt="${tags}" loading="lazy" width= '180px' />
                 <div class="info">
                     <p class="info-item">
-                        <b>Likes ${likes}</b>
+                        <b>Likes</b>
+                        <b>${likes}</b>
                     </p>
                     <p class="info-item">
-                        <b>Views ${views}</b>
+                        <b>Views</b>
+                        <b>${views}</b>
                     </p>
                     <p class="info-item">
-                        <b>Comments ${comments}</b>
+                        <b>Comments</b>
+                        <b>${comments}</b>
                     </p>
                     <p class="info-item">
-                        <b>Downloads ${downloads}</b>
+                        <b>Downloads</b>
+                        <b>${downloads}</b>
                     </p>
                 </div>
             </div>`
