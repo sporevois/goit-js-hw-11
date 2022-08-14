@@ -15,6 +15,8 @@ let limit = 40;
 let page = 0;
 let totalPages;
 
+
+
 refs.loadMoreBtn.classList.add('is-hidden');
 refs.form.addEventListener('submit', fetchOnSubmit)
 
@@ -25,23 +27,23 @@ async function fetchOnSubmit(event) {
     clearGallery();
     try {
     await fetchCards();
+    scrollBy();   
     const lightbox = new SimpleLightbox(".gallery a", {
         captionsData: "alt",
         captionDelay: 150,
     });
-
+           
     refs.loadMoreBtn.addEventListener('click', loadMore);
-    
     async function loadMore() {
         try {
             await fetchCards();
             lightbox.refresh();
+            scrollBy();
         }
         catch (error) {
             console.log(error);
         }
-    }   
-        
+    }      
     }
     catch (error) {
     console.log(error);
@@ -81,7 +83,6 @@ async function fetchCards() {
         page += 1;
 
         refs.loadMoreBtn.classList.remove('is-hidden');
-        // refs.loadMoreBtn.addEventListener('click', loadMore);
         
         renderCards(data);
         return console.log(data);
@@ -147,5 +148,14 @@ function createCard({ webformatURL, largeImageURL, tags, likes, views, comments,
 
 function clearGallery() {
     refs.gallery.innerHTML = "";
+}
+function scrollBy() {
+    const { height: cardHeight } = refs.gallery
+    .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+    top: cardHeight / 3,
+    behavior: "smooth",
+    });
 }
 
