@@ -27,7 +27,8 @@ async function fetchOnSubmit(event) {
     clearGallery();
     try {
     await fetchCards();
-    scrollBy();   
+    scrollBy();
+        
     const lightbox = new SimpleLightbox(".gallery a", {
         captionsData: "alt",
         captionDelay: 150,
@@ -39,11 +40,18 @@ async function fetchOnSubmit(event) {
             await fetchCards();
             lightbox.refresh();
             scrollBy();
+
+            if (page > totalPages) {
+                refs.loadMoreBtn.classList.add('is-hidden');
+                refs.loadMoreBtn.removeEventListener('click', fetchCards);
+                Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
+                return;
+            }
         }
         catch (error) {
             console.log(error);
         }
-    }      
+    }           
     }
     catch (error) {
     console.log(error);
@@ -63,23 +71,20 @@ async function fetchCards() {
         let amount = response.data.totalHits
         totalPages = Math.ceil(amount / limit);
         console.log(totalPages)
+        
 
         if (data.length === 0) {
             refs.loadMoreBtn.classList.add('is-hidden');
             Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
             return;
         }
-
-        if (page === 1) {
-            Notiflix.Notify.success(`Hooray! We found ${amount} images.`)
+        else {
+        Notiflix.Notify.success(`Hooray! We found ${amount} images.`)
         }
+            
 
-        if (page > totalPages) {
-            refs.loadMoreBtn.classList.add('is-hidden');
-            refs.loadMoreBtn.removeEventListener('click', fetchCards);
-            Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
-            return;
-        }
+ 
+
         page += 1;
 
         refs.loadMoreBtn.classList.remove('is-hidden');
