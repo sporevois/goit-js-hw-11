@@ -78,7 +78,8 @@ async function fetchCards() {
             Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
             return;
         }
-        else {
+
+        if (page === 1){
         Notiflix.Notify.success(`Hooray! We found ${amount} images.`)
         } 
 
