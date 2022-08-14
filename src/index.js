@@ -37,16 +37,14 @@ async function fetchOnSubmit(event) {
         try {
             await fetchCards();
             scrollBy();
+            lightbox.refresh();
 
             if (page > totalPages) {
                 refs.loadMoreBtn.classList.add('is-hidden');
                 refs.loadMoreBtn.removeEventListener('click', fetchCards);
                 Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
                 return;
-            }
-            
-            lightbox.refresh();
-            
+            }            
         }
         catch (error) {
             console.log(error);
