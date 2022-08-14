@@ -10,6 +10,8 @@ body {
   background-color: #fafafa;
   color: #212121;
   line-height: 1.5;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 #search-box {
@@ -21,11 +23,25 @@ body {
 
 .info {
 display: flex;
+justify-content: space-evenly;
+align-items: center;
+font-size: 14px;
+}
+.info-item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 :root {
   --timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   --animation-duration: 250ms;
+}
+.load-more{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .gallery {
@@ -58,3 +74,49 @@ display: flex;
 .is-hidden{
   display: none;
 }
+
+.gallery{
+  margin-bottom: 20px;
+  background: linear-gradient(to bottom right, pink, white);;
+}
+.button {
+  align-items: center;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.7em 1.4em 0.7em 1.1em;
+  color: white;
+  background: #ad5389;
+  background: linear-gradient(0deg, rgba(20, 167, 62, 1) 0%, rgba(102, 247, 113, 1) 100%);
+  border: none;
+  box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
+  letter-spacing: 0.05em;
+  border-radius: 20em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button:hover {
+  box-shadow: 0 0.5em 3em -2em #0f7a2d98;
+}
+
+.button:active {
+  box-shadow: 0 0.5em 3em -2em #0f7a2d98;
+}
+
+input {
+  margin-right: 16px;
+  height: 40px;
+  font-weight: 500;
+  font-size: 20px;
+  
+}
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+

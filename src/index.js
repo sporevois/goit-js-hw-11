@@ -1,6 +1,8 @@
 import "./css/styles.css";
 import axios from "axios";
 import Notiflix from "notiflix";
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const refs = {
     form: document.querySelector('.search-form'),
@@ -9,26 +11,55 @@ const refs = {
     gallery: document.querySelector('.gallery'),
     loadMoreBtn: document.querySelector('.load-more'),
 };
-let limit = 100;
+let limit = 40;
 let page = 0;
 let totalPages;
 
 refs.loadMoreBtn.classList.add('is-hidden');
 refs.form.addEventListener('submit', fetchOnSubmit)
 
-function fetchOnSubmit(event) {
+async function fetchOnSubmit(event) {
     event.preventDefault();
     page = 1;
+
     clearGallery();
-    fetchCards();
+    try {
+    await fetchCards();
+    const lightbox = new SimpleLightbox(".gallery a", {
+        captionsData: "alt",
+        captionDelay: 150,
+    });
+
+    refs.loadMoreBtn.addEventListener('click', loadMore);
+    
+    async function loadMore() {
+        try {
+            await fetchCards();
+            lightbox.refresh();
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }   
+        
+    }
+    catch (error) {
+    console.log(error);
+    }
+
 }
 
-async function fetchCards() {    
+async function fetchCards() {
+    if (!createURL()) {
+        refs.loadMoreBtn.classList.add('is-hidden');
+        refs.loadMoreBtn.removeEventListener('click', fetchCards);
+        return;
+    }
     try {
         const response = await axios.get(createURL());
         const data = response.data.hits;
         let amount = response.data.totalHits
-        totalPages = Math.ceil(amount/limit);
+        totalPages = Math.ceil(amount / limit);
         console.log(totalPages)
 
         if (data.length === 0) {
@@ -43,12 +74,14 @@ async function fetchCards() {
 
         if (page > totalPages) {
             refs.loadMoreBtn.classList.add('is-hidden');
+            refs.loadMoreBtn.removeEventListener('click', fetchCards);
             Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
             return;
         }
         page += 1;
+
         refs.loadMoreBtn.classList.remove('is-hidden');
-        refs.loadMoreBtn.addEventListener('click', fetchCards);
+        // refs.loadMoreBtn.addEventListener('click', loadMore);
         
         renderCards(data);
         return console.log(data);
@@ -56,27 +89,41 @@ async function fetchCards() {
     catch (error) {
     console.log(error);
     }
-    
 }
+
 function createURL() {
     const name = refs.input.value.trim();
     const API_KEY = '29184365-ad7d7355f63935605b47c8dfc';
     const BASE_URL = 'https://pixabay.com/api';
+    if (!name) {
+        Notiflix.Notify.failure("Pease, enter something to search query!");
+        return;
+    }
     const url = `${BASE_URL}/?key=${API_KEY}&q=${name}&page=${page}&per_page=${limit}&image_type=photo&orientation=horizontal&safesearch=true`;
     return url;
 }
 
-function renderCards(items) {
-    const markup = items
+async function renderCards(items) {
+    const markup = await items
       .map(createCard)
       .join("");
     refs.gallery.insertAdjacentHTML('beforeend', markup);
+
 }
 
-function createCard({ webformatURL, tags, likes, views, comments, downloads }) {
+function createCard({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) {
     return `
             <div class="photo-card">
-                <img class="photo-card__image" src="${webformatURL}" alt="${tags}" loading="lazy" width= '180px' />
+            <a class="gallery-item" href="${largeImageURL}">
+                <img
+                class="photo-card__image"
+                src="${webformatURL}"
+                alt="${tags}"
+                width= '180px'
+                loading="lazy"
+                />
+            </a>
+
                 <div class="info">
                     <p class="info-item">
                         <b>Likes</b>
