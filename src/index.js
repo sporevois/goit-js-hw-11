@@ -26,7 +26,11 @@ async function fetchOnSubmit(event) {
 
     clearGallery();
     try {
-    await fetchCards();        
+        await fetchCards();
+        if (totalPages !== 0) {
+            scrollBy();
+        }
+
     const lightbox = new SimpleLightbox(".gallery a", {
         captionsData: "alt",
         captionDelay: 150,
@@ -77,16 +81,15 @@ async function fetchCards() {
         }
 
         if (page === 1){
-        Notiflix.Notify.success(`Hooray! We found ${amount} images.`)
+            Notiflix.Notify.success(`Hooray! We found ${amount} images.`);
+            refs.loadMoreBtn.classList.remove('is-hidden');
         } 
 
         page += 1;
-
-        refs.loadMoreBtn.classList.remove('is-hidden');
         
         renderCards(data);
-
-        return console.log(data);
+        console.log(data);
+        return
     }
     catch (error) {
     console.log(error);
@@ -155,7 +158,7 @@ function scrollBy() {
     .firstElementChild.getBoundingClientRect();
 
     window.scrollBy({
-    top: cardHeight *2,
+    top: cardHeight / 2,
     behavior: "smooth",
     });
 }
