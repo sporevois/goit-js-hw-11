@@ -11,7 +11,7 @@ const refs = {
     gallery: document.querySelector('.gallery'),
     loadMoreBtn: document.querySelector('.load-more'),
 };
-let limit = 100;
+let limit = 40;
 let page = 0;
 let totalPages;
 
