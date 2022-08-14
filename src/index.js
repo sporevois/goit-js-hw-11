@@ -26,19 +26,16 @@ async function fetchOnSubmit(event) {
 
     clearGallery();
     try {
-    await fetchCards();
-    scrollBy();
-        
+    await fetchCards();        
     const lightbox = new SimpleLightbox(".gallery a", {
         captionsData: "alt",
         captionDelay: 150,
     });
-           
+      
     refs.loadMoreBtn.addEventListener('click', loadMore);
     async function loadMore() {
         try {
             await fetchCards();
-            lightbox.refresh();
             scrollBy();
 
             if (page > totalPages) {
@@ -47,6 +44,9 @@ async function fetchOnSubmit(event) {
                 Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
                 return;
             }
+            
+            lightbox.refresh();
+            
         }
         catch (error) {
             console.log(error);
@@ -80,16 +80,14 @@ async function fetchCards() {
         }
         else {
         Notiflix.Notify.success(`Hooray! We found ${amount} images.`)
-        }
-            
-
- 
+        } 
 
         page += 1;
 
         refs.loadMoreBtn.classList.remove('is-hidden');
         
         renderCards(data);
+
         return console.log(data);
     }
     catch (error) {
@@ -159,7 +157,7 @@ function scrollBy() {
     .firstElementChild.getBoundingClientRect();
 
     window.scrollBy({
-    top: cardHeight / 3,
+    top: cardHeight *2,
     behavior: "smooth",
     });
 }
