@@ -43,7 +43,6 @@ async function fetchOnSubmit(event) {
                 refs.loadMoreBtn.classList.add('is-hidden');
                 refs.loadMoreBtn.removeEventListener('click', fetchCards);
                 Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
-                return;
             }            
         }
         catch (error) {
