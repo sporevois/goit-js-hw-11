@@ -14,106 +14,106 @@ const refs = {
 let limit = 40;
 let page = 0;
 let totalPages;
-
+let name;
+const lightbox = new SimpleLightbox(".gallery a", {
+  captionsData: "alt",
+  captionDelay: 250,
+});
 
 
 refs.loadMoreBtn.classList.add('is-hidden');
 refs.form.addEventListener('submit', fetchOnSubmit)
 
+
 async function fetchOnSubmit(event) {
     event.preventDefault();
-    page = 1;
-
+    refs.loadMoreBtn.addEventListener('click', loadMore);
+    name = refs.input.value.trim();
     clearGallery();
+    page = 1;
+    console.log('PAGE:', page);
     try {
-        await fetchCards();
+        const data = await fetchCards(name);
+        await renderCards(data);
+        
         if (totalPages !== 0) {
             scrollBy();
-        }
-
-    const lightbox = new SimpleLightbox(".gallery a", {
-        captionsData: "alt",
-        captionDelay: 150,
-    });
-      
-    refs.loadMoreBtn.addEventListener('click', loadMore);
-    async function loadMore() {
-        try {
-            await fetchCards();
-            scrollBy();
-            lightbox.refresh();
-
-            if (page > totalPages) {
-                refs.loadMoreBtn.classList.add('is-hidden');
-                refs.loadMoreBtn.removeEventListener('click', fetchCards);
-                Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
-            }            
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }           
+        }            
     }
     catch (error) {
     console.log(error);
     }
 
 }
-
-async function fetchCards() {
-    if (!createURL()) {
-        refs.loadMoreBtn.classList.add('is-hidden');
-        refs.loadMoreBtn.removeEventListener('click', fetchCards);
-        return;
-    }
+            
+async function loadMore() {
+    page += 1;
+    console.log('PAGE:', page);
     try {
-        const response = await axios.get(createURL());
-        const data = response.data.hits;
-        let amount = response.data.totalHits
-        totalPages = Math.ceil(amount / limit);
-        console.log(totalPages)
+        const data = await fetchCards(name);
+        await renderCards(data);
+        lightbox.refresh();
+        scrollBy();
         
-
-        if (data.length === 0) {
+        if (page >= totalPages) {
             refs.loadMoreBtn.classList.add('is-hidden');
-            Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-            return;
+            refs.loadMoreBtn.removeEventListener('click', loadMore);
+            Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
         }
-
-        if (page === 1){
-            Notiflix.Notify.success(`Hooray! We found ${amount} images.`);
-            refs.loadMoreBtn.classList.remove('is-hidden');
-        } 
-
-        page += 1;
-        
-        renderCards(data);
-        console.log(data);
-        return
     }
     catch (error) {
-    console.log(error);
+        console.log(error);
     }
 }
-
-function createURL() {
-    const name = refs.input.value.trim();
+            
+async function fetchCards(search) {
     const API_KEY = '29184365-ad7d7355f63935605b47c8dfc';
     const BASE_URL = 'https://pixabay.com/api';
-    if (!name) {
+    if (!search) {
         Notiflix.Notify.failure("Pease, enter something to search query!");
         return;
     }
-    const url = `${BASE_URL}/?key=${API_KEY}&q=${name}&page=${page}&per_page=${limit}&image_type=photo&orientation=horizontal&safesearch=true`;
-    return url;
+    const url = `${BASE_URL}/?key=${API_KEY}&q=${search}&page=${page}&per_page=${limit}&image_type=photo&orientation=horizontal&safesearch=true`;
+
+    try {
+        const response = await axios.get(url);
+        const data = response.data.hits;
+        const amount = response.data.totalHits
+        totalPages = Math.ceil(amount / limit);
+        console.log('TOTAL PAGES:',totalPages)
+        
+        if (amount > 0 && amount <= 40) {        
+            refs.loadMoreBtn.classList.add('is-hidden');
+            refs.loadMoreBtn.removeEventListener('click', loadMore);
+            Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");  
+        }
+
+        if (amount === 0) {
+            Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
+            refs.loadMoreBtn.classList.add('is-hidden');
+            return;
+        }
+
+        if (page === 1 && amount > 40){
+            Notiflix.Notify.success(`Hooray! We found ${amount} images.`);
+            refs.loadMoreBtn.classList.remove('is-hidden');
+        }
+        console.log(data)
+        return data;
+    }
+    catch (error) {
+    console.log(error);
+    }
 }
 
 async function renderCards(items) {
+    if (!items) {
+        return
+    }
     const markup = await items
       .map(createCard)
       .join("");
     refs.gallery.insertAdjacentHTML('beforeend', markup);
-
 }
 
 function createCard({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) {
