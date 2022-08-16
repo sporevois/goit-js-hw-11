@@ -29,7 +29,7 @@ refs.form.addEventListener('submit', fetchOnSubmit)
 
 async function fetchOnSubmit(event) {
     event.preventDefault();
-    
+
     refs.loadMoreBtn.addEventListener('click', loadMore);
     name = refs.input.value.trim();
     if (!name) {
@@ -47,6 +47,7 @@ async function fetchOnSubmit(event) {
         
         const markup = await renderCards(hitsArr);
         refs.gallery.insertAdjacentHTML('beforeend', markup);
+        lightbox.refresh();
         
         if (totalPages !== 0) {
             scrollBy();
